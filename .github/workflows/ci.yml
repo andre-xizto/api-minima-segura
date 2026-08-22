@@ -10,8 +10,9 @@ on:
     inputs:
       node-version:
         description: 'Node.js version'
+        type: number
         required: false
-        default: '24'
+        default: 24
 
 jobs:
   ci:

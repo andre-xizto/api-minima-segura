@@ -7,11 +7,46 @@ on:
 jobs:
   ci:
     uses: ./.github/workflows/ci.yml
+    with:
+      node-version: 24
 
   deploy:
     runs-on: ubuntu-latest
     needs: ci
     steps:
-      - name: Trigger Render deploy via API
+      - name: Validate Render deploy hook secret
         run: |
-          curl -X POST "${{ secrets.RENDER_DEPLOY_HOOK }}"
+          if [ -z "${{ secrets.RENDER_DEPLOY_HOOK }}" ]; then
+            echo "::error title=Configuration Error::RENDER_DEPLOY_HOOK secret is not set in repository secrets."
+            echo "### ❌ Deploy Aborted" >> $GITHUB_STEP_SUMMARY
+            echo "Reason: **RENDER_DEPLOY_HOOK** secret is missing." >> $GITHUB_STEP_SUMMARY
+            exit 1
+          fi
+
+      - name: Trigger Render deploy via API
+        id: deploy_request
+        run: |
+          echo "::group::Sending POST request to Render"
+          STATUS_CODE=$(curl -s -o /dev/null -w "%{http_code}" -X POST "${{ secrets.RENDER_DEPLOY_HOOK }}")
+          echo "Render API returned status code: $STATUS_CODE"
+          echo "::endgroup::"
+          
+          if [ "$STATUS_CODE" -lt 200 ] || [ "$STATUS_CODE" -gt 299 ]; then
+            echo "::error title=Deploy Failed::Render hook returned an unsuccessful status code ($STATUS_CODE)."
+            exit 1
+          fi
+
+      - name: Generate Success Summary
+        if: success()
+        run: |
+          echo "### 🚀 Deploy Triggered Successfully!" >> $GITHUB_STEP_SUMMARY
+          echo "The deployment has been successfully initiated on **Render** after all CI checks passed." >> $GITHUB_STEP_SUMMARY
+          echo "- **Triggered by:** @${{ github.actor }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Commit:** [\`${{ github.sha }}\`](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }})" >> $GITHUB_STEP_SUMMARY
+
+      - name: Generate Failure Summary
+        if: failure() && steps.deploy_request.outcome == 'failure'
+        run: |
+          echo "### 🚨 Deploy Trigger Failed!" >> $GITHUB_STEP_SUMMARY
+          echo "The application build passed CI, but the webhook handshake with **Render** failed." >> $GITHUB_STEP_SUMMARY
+          echo "Please inspect the **Trigger Render deploy via API** step logs above for details." >> $GITHUB_STEP_SUMMARY

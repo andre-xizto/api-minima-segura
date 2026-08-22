@@ -5,7 +5,6 @@ import { config } from './config.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-// Em testes usa banco em memória para não poluir o arquivo real.
 const dbPath = config.isTest ? ':memory:' : path.join(__dirname, '..', 'data.db');
 
 const db = new Database(dbPath);

@@ -26,16 +26,16 @@ API de exemplo em Node.js + Express + SQLite, construída para testar uma **este
 
 ```bash
 npm install
-cp .env.example .env   # ajuste os valores
-npm run dev            # http://localhost:3000
+cp .env.example .env
+npm run dev
 ```
 
 ## Testes, lint e build
 
 ```bash
-npm test        # vitest + supertest
-npm run lint    # eslint
-npm run build   # checagem de sintaxe
+npm test
+npm run lint
+npm run build
 ```
 
 ## Docker
@@ -53,20 +53,17 @@ docker run -p 3000:3000 api-minima-segura
 ## Guia de deploy (Render, gratuito, sem auto-deploy)
 
 1. Crie uma conta em [render.com](https://render.com) (login com GitHub).
-2. **New → Web Service → Connect repository** → selecione `api-minima-segura`.
+2. **New → Web Service → Connect repository** → selecione `api-minima-segura` ou nome do projeto.
 3. Configuração:
    - **Build Command:** `npm ci && npm run build`
    - **Start Command:** `npm start`
-   - **Environment:** Node 22
+   - **Environment:** Node 24
    - **Instance Type:** Free
 4. **Environment Variables:** `PORT=10000`, `CORS_ORIGIN`, `NODE_ENV=production`.
 5. **Desative o Auto-Deploy** (Settings → Deploy → Auto-Deploy: **Off**). O deploy será feito apenas pelo pipeline.
 6. Copie o **Deploy Hook** (Settings → Deploy → Deploy Hook) — é uma URL completa.
 7. No GitHub, adicione o segredo `RENDER_DEPLOY_HOOK` com essa URL (Settings → Secrets and variables → Actions → New repository secret).
 8. Faça um push no `main`: o CI roda, o CD chama o hook e o Render redeploya.
-9. Valide em `https://<nome>.onrender.com/health`.
-
-> **Atenção:** no plano free do Render o disco é efêmero — os dados do SQLite são apagados a cada redeploy. Para estudo/demo é aceitável; para persistência real, use um banco externo (ex.: Turso/libSQL, Supabase).
 
 ## Segurança
 

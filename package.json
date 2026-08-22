@@ -1,0 +1,41 @@
+{
+  "name": "api-minima-segura",
+  "version": "1.0.0",
+  "description": "API minima e segura de exemplo com Node.js, Express e SQLite, com esteira de CI/CD.",
+  "main": "src/server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "eslint .",
+    "build": "node --check src/server.js && node --check src/app.js && node --check src/db.js"
+  },
+  "keywords": [
+    "api",
+    "express",
+    "sqlite",
+    "ci",
+    "cd"
+  ],
+  "author": "Andre",
+  "license": "MIT",
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "better-sqlite3": "^13.0.3",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^4.22.2",
+    "express-rate-limit": "^8.6.2",
+    "helmet": "^8.3.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.9.0",
+    "supertest": "^7.2.2",
+    "vitest": "^4.1.11"
+  }
+}
